@@ -1,0 +1,6 @@
+*.txt
+*.iml
+node_modules
+.idea
+collection*.json
+etag_collection.json
