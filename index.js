@@ -219,19 +219,19 @@ return fs.stat(cards_file)
                     process.stdout.write(rarity + ": ");
                     if (owned[set].cards.hasOwnProperty(rarity)) process.stdout.write(owned[set].cards[rarity] + "/");
                     else process.stdout.write("0/");
-                    if (total[set].cards.hasOwnProperty(rarity)) process.stdout.write(total[set].cards[rarity] + " ");
-                    else process.stdout.write("0 ");
-                    if (missing[set].cards.hasOwnProperty(rarity)) process.stdout.write("(Missing " + missing[set].cards[rarity] + ");\t");
-                    else process.stdout.write("(Complete!);\t");
-                    if (surplus[set].cards[0].hasOwnProperty(rarity)) process.stdout.write("Surplus (+" + surplus[set].cards[0][rarity] + " ");
-                    else process.stdout.write("(+0 ");
-                    if (surplus[set].cards[1].hasOwnProperty(rarity)) process.stdout.write("+" + surplus[set].cards[1][rarity] + ")\n");
-                    else process.stdout.write("+0)\n");
+                    if (total[set].cards.hasOwnProperty(rarity)) process.stdout.write(total[set].cards[rarity] + "\r\t\t\t\t");
+                    else process.stdout.write("0\r\t\t\t\t");
+                    if (missing[set].cards[rarity]) process.stdout.write("Missing " + missing[set].cards[rarity] + "\r\t\t\t\t\t\t\t");
+                    else process.stdout.write("Complete!\r\t\t\t\t\t\t\t");
+                    if (surplus[set].cards[0].hasOwnProperty(rarity)) process.stdout.write("Surplus (Normal cards: +" + surplus[set].cards[0][rarity] + "; ");
+                    else process.stdout.write("Surplus (Normal cards: +0; ");
+                    if (surplus[set].cards[1].hasOwnProperty(rarity)) process.stdout.write("Golden cards: +" + surplus[set].cards[1][rarity] + ")\n");
+                    else process.stdout.write("Golden cards: +0)\n");
                 }
                 process.stdout.write("Cost: " + owned[set].dust);
                 process.stdout.write("/" + total[set].dust);
-                process.stdout.write(" (" + missing[set].dust + ")\t\t");
-                process.stdout.write("Surplus: " + surplus[set].dust + "\n\n");
+                process.stdout.write(" (Needs " + missing[set].dust + " arcane dust)\r\t\t\t\t\t\t\t");
+                process.stdout.write("Surplus: " + surplus[set].dust + " arcane dust\n\n");
             }
         }
     })
