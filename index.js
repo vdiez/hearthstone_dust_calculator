@@ -254,7 +254,7 @@ return fs.stat(cards_file)
                 process.stdout.write(":\n");
                 for (let rarity in limits_by_rarity) {
                     process.stdout.write(rarity + ": ");
-                    if (owned.total.cards.hasOwnProperty(rarity)) process.stdout.write(owned[set].cards[rarity] + "");
+                    if (owned[set].cards.hasOwnProperty(rarity)) process.stdout.write(owned[set].cards[rarity] + "");
                     else process.stdout.write("0");
 
                     process.stdout.write("/");
