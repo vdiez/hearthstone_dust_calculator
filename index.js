@@ -14,10 +14,10 @@ let current_etag_cards, latest_etag_cards;
 let current_etag_collections, current_etag_collection, latest_etag_collection;
 let current_etag_global, latest_etag_global;
 let collection, cards, global;
-let missing = {total: {cards: {}, dust: {all: 0}}};
-let owned = {total: {cards: {}, dust: {all: 0}}};
-let surplus = {total: {cards: [{},{}], dust: 0}};
-let total = {total: {cards: {}, dust: {all: 0}}};
+let missing = {total: {cards: {all: 0}, dust: {all: 0}}};
+let owned = {total: {cards: {all: 0}, dust: {all: 0}}};
+let surplus = {total: {cards: [{all: 0},{all: 0}], dust: {all: 0}}};
+let total = {total: {cards: {all: 0}, dust: {all: 0}}};
 let crafting_cost = [{FREE: 0, LEGENDARY: 1600, RARE: 100, COMMON: 40, EPIC: 400},{FREE: 0, LEGENDARY: 3200, RARE: 800, COMMON: 400, EPIC: 1600}];
 let disenchanting_reward = [{FREE: 0, LEGENDARY: 400, RARE: 20, COMMON: 5, EPIC: 100},{FREE: 0, LEGENDARY: 1600, RARE: 100, COMMON: 50, EPIC: 400}];
 let limits_by_rarity = {FREE: 2, COMMON: 2, RARE: 2, EPIC: 2, LEGENDARY: 1};
@@ -144,10 +144,10 @@ return fs.stat(cards_file)
                 if (!limits_by_rarity.hasOwnProperty(cards[card_id].rarity)) limits_by_rarity[cards[card_id].rarity] = 2;
                 let limit = Math.min(limits_by_type[cards[card_id].type], limits_by_rarity[cards[card_id].rarity]);
                 if (!missing.hasOwnProperty(cards[card_id].set)) {
-                    missing[cards[card_id].set] = {cards: {}, dust: {all: 0}};
-                    owned[cards[card_id].set] = {cards: {}, dust: {all: 0}};
-                    total[cards[card_id].set] = {cards: {}, dust: {all: 0}};
-                    surplus[cards[card_id].set] = {cards: [{},{}], dust: 0};
+                    missing[cards[card_id].set] = {cards: {all: 0}, dust: {all: 0}};
+                    owned[cards[card_id].set] = {cards: {all: 0}, dust: {all: 0}};
+                    total[cards[card_id].set] = {cards: {all: 0}, dust: {all: 0}};
+                    surplus[cards[card_id].set] = {cards: [{all: 0},{all: 0}], dust: {all: 0}};
                 }
                 if (!missing[cards[card_id].set].cards.hasOwnProperty(cards[card_id].rarity)) {
                     missing[cards[card_id].set].cards[cards[card_id].rarity] = 0;
@@ -158,6 +158,7 @@ return fs.stat(cards_file)
                     total[cards[card_id].set].dust[cards[card_id].rarity] = 0;
                     surplus[cards[card_id].set].cards[0][cards[card_id].rarity] = 0;
                     surplus[cards[card_id].set].cards[1][cards[card_id].rarity] = 0;
+                    surplus[cards[card_id].set].dust[cards[card_id].rarity] = 0;
                 }
                 if (!missing.total.cards.hasOwnProperty(cards[card_id].rarity)) {
                     missing.total.cards[cards[card_id].rarity] = 0;
@@ -168,55 +169,75 @@ return fs.stat(cards_file)
                     total.total.dust[cards[card_id].rarity] = 0;
                     surplus.total.cards[0][cards[card_id].rarity] = 0;
                     surplus.total.cards[1][cards[card_id].rarity] = 0;
+                    surplus.total.dust[cards[card_id].rarity] = 0;
                 }
                 total.total.cards[cards[card_id].rarity] += limit;
+                total.total.cards.all += limit;
                 total.total.dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                 total.total.dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
                 total[cards[card_id].set].cards[cards[card_id].rarity] += limit;
+                total[cards[card_id].set].cards.all += limit;
                 total[cards[card_id].set].dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                 total[cards[card_id].set].dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
                 if (collection.hasOwnProperty(card_id)) {
                     let total = collection[card_id][0] + collection[card_id][1];
                     if (total < limit) {
                         owned.total.cards[cards[card_id].rarity] += total;
+                        owned.total.cards.all += total;
                         owned.total.dust.all += total * crafting_cost[0][cards[card_id].rarity];
                         owned.total.dust[cards[card_id].rarity] += total * crafting_cost[0][cards[card_id].rarity];
                         owned[cards[card_id].set].cards[cards[card_id].rarity] += total;
+                        owned[cards[card_id].set].cards.all += total;
                         owned[cards[card_id].set].dust.all += total * crafting_cost[0][cards[card_id].rarity];
                         owned[cards[card_id].set].dust[cards[card_id].rarity] += total * crafting_cost[0][cards[card_id].rarity];
                         missing.total.cards[cards[card_id].rarity] += limit - total;
+                        missing.total.cards.all += limit - total;
                         missing.total.dust.all += (limit - total) * crafting_cost[0][cards[card_id].rarity];
                         missing.total.dust[cards[card_id].rarity] += (limit - total) * crafting_cost[0][cards[card_id].rarity];
                         missing[cards[card_id].set].cards[cards[card_id].rarity] += limit - total;
+                        missing[cards[card_id].set].cards.all += limit - total;
                         missing[cards[card_id].set].dust.all += (limit - total) * crafting_cost[0][cards[card_id].rarity];
                         missing[cards[card_id].set].dust[cards[card_id].rarity] += (limit - total) * crafting_cost[0][cards[card_id].rarity];
                     }
                     else {
                         owned.total.cards[cards[card_id].rarity] += limit;
+                        owned.total.cards.all += limit;
                         owned.total.dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                         owned.total.dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
                         owned[cards[card_id].set].cards[cards[card_id].rarity] += limit;
+                        owned[cards[card_id].set].cards.all += limit;
                         owned[cards[card_id].set].dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                         owned[cards[card_id].set].dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
+
                         let golden_excess = collection[card_id][1] > limit ? collection[card_id][1] - limit : 0;
                         surplus.total.cards[1][cards[card_id].rarity] += golden_excess;
-                        surplus.total.dust += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
+                        surplus.total.cards[1].all += golden_excess;
+                        surplus.total.dust[cards[card_id].rarity] += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
+                        surplus.total.dust.all += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
                         surplus[cards[card_id].set].cards[1][cards[card_id].rarity] += golden_excess;
-                        surplus[cards[card_id].set].dust += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
+                        surplus[cards[card_id].set].cards[1].all += golden_excess;
+                        surplus[cards[card_id].set].dust[cards[card_id].rarity] += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
+                        surplus[cards[card_id].set].dust.all += golden_excess * disenchanting_reward[1][cards[card_id].rarity];
 
                         let normal_excess = collection[card_id][0] > limit ? collection[card_id][0] - limit : 0;
                         //normal_excess += collection[card_id][1] > limit ? limit : collection[card_id][1];
                         surplus.total.cards[0][cards[card_id].rarity] += normal_excess;
-                        surplus.total.dust += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
+                        surplus.total.cards[0].all += normal_excess;
+                        surplus.total.dust[cards[card_id].rarity] += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
+                        surplus.total.dust.all += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
                         surplus[cards[card_id].set].cards[0][cards[card_id].rarity] += normal_excess;
-                        surplus[cards[card_id].set].dust += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
+                        surplus[cards[card_id].set].cards[0].all += normal_excess;
+                        surplus[cards[card_id].set].dust[cards[card_id].rarity] += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
+                        surplus[cards[card_id].set].dust.all += normal_excess * disenchanting_reward[0][cards[card_id].rarity];
                     }
                 }
                 else {
                     missing.total.cards[cards[card_id].rarity] += limit;
+                    missing.total.cards.all += limit;
                     missing.total.dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                     missing.total.dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
                     missing[cards[card_id].set].cards[cards[card_id].rarity] += limit;
+                    missing[cards[card_id].set].cards.all += limit;
                     missing[cards[card_id].set].dust.all += limit * crafting_cost[0][cards[card_id].rarity];
                     missing[cards[card_id].set].dust[cards[card_id].rarity] += limit * crafting_cost[0][cards[card_id].rarity];
                 }
@@ -233,7 +254,7 @@ return fs.stat(cards_file)
                 process.stdout.write(":\n");
                 for (let rarity in limits_by_rarity) {
                     process.stdout.write(rarity + ": ");
-                    if (owned[set].cards.hasOwnProperty(rarity)) process.stdout.write(owned[set].cards[rarity] + "");
+                    if (owned.total.cards.hasOwnProperty(rarity)) process.stdout.write(owned[set].cards[rarity] + "");
                     else process.stdout.write("0");
 
                     process.stdout.write("/");
@@ -262,13 +283,31 @@ return fs.stat(cards_file)
 
                     process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t");
 
-                    if (surplus[set].cards[0].hasOwnProperty(rarity)) process.stdout.write("Surplus (Normal cards: +" + surplus[set].cards[0][rarity] + "; ");
-                    else process.stdout.write("Surplus (Normal cards: +0; ");
-                    if (surplus[set].cards[1].hasOwnProperty(rarity)) process.stdout.write("Golden cards: +" + surplus[set].cards[1][rarity] + ")");
-                    else process.stdout.write("Golden cards: +0)");
+                    if (surplus[set].cards[0].hasOwnProperty(rarity)) process.stdout.write("Surplus: Normal +" + surplus[set].cards[0][rarity]);
+                    else process.stdout.write("Surplus: Normal +0");
+                    process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t\t\t\t");
+                    if (surplus[set].cards[1].hasOwnProperty(rarity)) process.stdout.write("Golden +" + surplus[set].cards[1][rarity]);
+                    else process.stdout.write("Golden +0");
+                    process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+                    if (surplus[set].dust.hasOwnProperty(rarity)) process.stdout.write("Dust +" + surplus[set].dust[rarity]);
+                    else process.stdout.write("Dust +0");
 
                     process.stdout.write("\n");
                 }
+                process.stdout.write("OVERALL: ");
+                if (owned[set].cards.all) process.stdout.write(owned[set].cards.all + "");
+                else process.stdout.write("0");
+
+                process.stdout.write("/");
+
+                if (total[set].cards.all) process.stdout.write(total[set].cards.all + "");
+                else process.stdout.write("0");
+                process.stdout.write("\r\t\t\t");
+
+                if (missing[set].cards.all) process.stdout.write("Missing " + missing[set].cards.all);
+                else process.stdout.write("Complete!");
+
+
                 process.stdout.write("\r\t\t\t\t\t");
                 process.stdout.write("Cost: " + owned[set].dust.all);
                 process.stdout.write("/" + total[set].dust.all);
@@ -276,7 +315,15 @@ return fs.stat(cards_file)
                 if (missing[set].dust) process.stdout.write("Missing " + missing[set].dust.all);
                 else process.stdout.write(" Complete!");
                 process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t");
-                process.stdout.write("Surplus: " + surplus[set].dust + " arcane dust\n\n");
+                if (surplus[set].cards[0].all) process.stdout.write("Surplus: Normal +" + surplus[set].cards[0].all);
+                else process.stdout.write("Surplus: Normal +0");
+                process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t\t\t\t");
+                if (surplus[set].cards[1].all) process.stdout.write("Golden +" + surplus[set].cards[1].all);
+                else process.stdout.write("Golden +0");
+                process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t");
+                if (surplus[set].dust.all) process.stdout.write("Dust +" + surplus[set].dust.all);
+                else process.stdout.write("Dust +0");
+                process.stdout.write("\n\n");
             }
         }
     })
