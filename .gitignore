@@ -4,3 +4,5 @@ node_modules
 .idea
 collection*.json
 etag_collection.json
+cards.collectible.json
+global.json

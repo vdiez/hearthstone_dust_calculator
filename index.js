@@ -312,8 +312,8 @@ return fs.stat(cards_file)
                 process.stdout.write("Cost: " + owned[set].dust.all);
                 process.stdout.write("/" + total[set].dust.all);
                 process.stdout.write("\r\t\t\t\t\t\t\t\t");
-                if (missing[set].dust) process.stdout.write("Missing " + missing[set].dust.all);
-                else process.stdout.write(" Complete!");
+                if (missing[set].dust.all) process.stdout.write("Missing " + missing[set].dust.all);
+                else process.stdout.write("Complete!");
                 process.stdout.write("\r\t\t\t\t\t\t\t\t\t\t");
                 if (surplus[set].cards[0].all) process.stdout.write("Surplus: Normal +" + surplus[set].cards[0].all);
                 else process.stdout.write("Surplus: Normal +0");
